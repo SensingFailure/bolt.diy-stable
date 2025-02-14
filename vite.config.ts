@@ -30,6 +30,11 @@ export default defineConfig((config) => {
     },
     build: {
       target: 'esnext',
+      rollupOptions: {
+        output: {
+          format: 'esm'
+        }
+      }
     },
     plugins: [
       nodePolyfills({

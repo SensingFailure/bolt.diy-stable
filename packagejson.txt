@@ -9,6 +9,7 @@
   "scripts": {
     "build": "remix vite:build",
     "dev": "concurrently \"node scripts/start-dynamodb-local.js\" \"wait-on tcp:8000 && node scripts/init-dynamodb.js && node pre-start.cjs && remix vite:dev\"",
+    "start:prod": "NODE_ENV=production node server.js",
     "dynamodb:start": "node scripts/start-dynamodb-local.js",
     "test": "vitest --run",
     "test:watch": "vitest",
@@ -24,7 +25,7 @@
     "typegen": "wrangler types",
     "preview": "pnpm run build && pnpm run start",
     "prepare": "husky",
-    "dockerstart": "bindings=$(./bindings.sh) && wrangler pages dev ./build/client $bindings --ip 0.0.0.0 --port 5173 --no-show-interactive-dev-session"
+    "dockerstart": "pnpm run start:prod"
   },
   "engines": {
     "node": ">=18.18.0"

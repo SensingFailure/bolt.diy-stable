@@ -1,17 +1,31 @@
-import { useStore } from '@nanostores/react';
-import type { LinksFunction } from '@remix-run/cloudflare';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
-import { themeStore } from './lib/stores/theme';
-import { stripIndents } from './utils/stripIndent';
-import { createHead } from 'remix-island';
 import { useEffect } from 'react';
+import { useStore } from '@nanostores/react';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
+import { ClientOnly } from 'remix-utils/client-only';
+import type { LinksFunction, LoaderFunction } from '@remix-run/cloudflare';
+import { createHead } from 'remix-island';
 
+// Styles
+import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
-
 import 'virtual:uno.css';
+
+// Components
+import { AuthCheck } from './components/auth/AuthCheck.client';
+import { AppInit } from './components/AppInit.client';
+
+// Utils and stores
+import { themeStore } from './lib/stores/theme';
+import { stripIndents } from './utils/stripIndent';
+import { getAuthUser } from './lib/auth.server';
+import type { User } from './lib/db/user.server';
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getAuthUser(request);
+  return { user };
+};
 
 export const links: LinksFunction = () => [
   {
@@ -78,22 +92,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-import { logStore } from './lib/stores/logs';
-
 export default function App() {
-  const theme = useStore(themeStore);
-
-  useEffect(() => {
-    logStore.logSystem('Application initialized', {
-      theme,
-      platform: navigator.platform,
-      userAgent: navigator.userAgent,
-      timestamp: new Date().toISOString(),
-    });
-  }, []);
+  const { user } = useLoaderData<{ user: User | null }>();
 
   return (
     <Layout>
+      <ClientOnly fallback={null}>
+        {() => (
+          <>
+            <AuthCheck isAuthenticated={!!user} />
+            <AppInit />
+          </>
+        )}
+      </ClientOnly>
       <Outlet />
     </Layout>
   );

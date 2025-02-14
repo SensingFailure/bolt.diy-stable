@@ -19,8 +19,8 @@ README.md
 **/*.log
 **/node_modules
 **/dist
-**/build
 **/.cache
+**/build
 logs
 dist-ssr
 .DS_Store

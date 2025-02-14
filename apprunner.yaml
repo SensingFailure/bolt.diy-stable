@@ -1,0 +1,20 @@
+version: 1.0
+runtime: nodejs18
+build:
+  commands:
+    build:
+      - npm install -g pnpm
+      - pnpm install
+      - pnpm run build
+      - rm -rf node_modules
+      - pnpm install --prod
+run:
+  command: pnpm run dockerstart
+  network:
+    port: 5173
+    healthCheck:
+      path: "/"
+      interval: 10
+      timeout: 5
+      healthyThreshold: 2
+      unhealthyThreshold: 5
