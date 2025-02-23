@@ -23,7 +23,7 @@ const client = new DynamoDBClient(
           accessKeyId: 'local',
           secretAccessKey: 'local',
         },
-      }
+      },
 );
 
 const docClient = DynamoDBDocument.from(client);
